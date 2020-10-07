@@ -1,2 +1,2 @@
-# ankiaddonleech
-For gracefully dealing with leeches
+# anki is here
+For gracefully dealing with frustrating cards
