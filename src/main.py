@@ -1,21 +1,14 @@
 # license
-
-import sys
-import os
-import random
 import anki
 
 from aqt.qt import *
-from aqt import mw
-from aqt.reviewer import Reviewer
 from aqt.deckconf import DeckConf
 from aqt.forms import dconf
-from aqt.utils import tooltip
 
 from anki.sched import Scheduler
-from anki.schedv2 import Scheduler
+# from anki.schedv2 import Scheduler
 
-from anki.hooks import addHook, wrap
+from anki.hooks import wrap
 from . import sortconfig
 
 
@@ -26,7 +19,17 @@ def setup_ui(self, Dialog):
     self.toggleAddon = QCheckBox("Enable Anki Ultimate")
     # self.toggleAddon.stateChanged.connect(checked)
     grid.addWidget(self.toggleAddon, 0, 0, 1, 1)
-    self.verticalLayout_6.insertLayout(4, grid)
+    self.verticalLayout_6.insertLayout(10, grid)
+
+    grid = QGridLayout()
+    label1 = QLabel(self.tab_5)
+    label1.setText("Special Queue Type")
+    grid.addWidget(label1, 0, 0, 1, 1)
+    self.choicesDropDown = QComboBox()
+    for i in sortconfig.SORT_OPTIONS:
+        self.choicesDropDown.addItem(sortconfig.SORT_OPTIONS.get(i)[0])
+    grid.addWidget(self.choicesDropDown, 0, 1, 1, 1)
+    self.verticalLayout_6.insertLayout(10, grid)
 
 
 def fill_review(self, recursing=False) -> bool:
@@ -36,17 +39,21 @@ def fill_review(self, recursing=False) -> bool:
     if not self.revCount:
         return False
 
-    anki_ultimate = 1
-    if not anki_ultimate:
+    # check if special queue is enabled
+    # needsdeckself = DeckManager.confForDid(self._revDids[0]).get('toggleAddon', 0)
+    deck_conf = self.col.decks.confForDid(self._revDids[0])
+    enabled = deck_conf.get('toggleAddon', 0)
+    if not enabled:
         return False
 
     while self._revDids:
         did = self._revDids[0]
+
         lim = min(self.queueLimit, self._deckRevLimit(did))
         if lim:
             # fill the queue with the current did
 
-            selected: int = 2
+            selected: int = deck_conf.get('choicesDropDown')
             sort_by: str = sortconfig.SORT_OPTIONS.get(selected)[1]
 
             # working
@@ -101,19 +108,22 @@ def load_config(self):
     f = self.form
     addon_config = self.conf
     f.toggleAddon.setChecked(addon_config.get('toggleAddon', 0))
-    # f.toggleAddon.setEnabled(addon_config.get('toggleAddon', 0))
+    f.choicesDropDown.setCurrentIndex(addon_config.get('choicesDropDown', 0))
 
 
 def save_config(self):
     f = self.form
     addon_config = self.conf
     addon_config['toggleAddon'] = f.toggleAddon.isChecked()
+    addon_config['choicesDropDown'] = f.choicesDropDown.currentIndex()
 
 
-# # Hooks
+# Hooks
 dconf.Ui_Dialog.setupUi = wrap(dconf.Ui_Dialog.setupUi, setup_ui)
 DeckConf.loadConf = wrap(DeckConf.loadConf, load_config)
 DeckConf.saveConf = wrap(DeckConf.saveConf, save_config, 'before')
 
 # anki.sched.Scheduler._fillRev = fill_review
-anki.sched.Scheduler._fillRev = wrap(anki.sched.Scheduler._fillRev, fill_review, 'before')
+anki.sched.Scheduler._fillRev = wrap(
+    anki.sched.Scheduler._fillRev, fill_review, 'before'
+)

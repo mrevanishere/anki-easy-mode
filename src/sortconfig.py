@@ -1,14 +1,14 @@
 SORT_OPTIONS = {
     0: [
-        "Winner's Queue: Lapses asc, Repetitions desc, Interval desc",
+        "Winner's Queue: easy first, lapses, reps, ivl",
         "lapses asc, reps desc, ivl desc"
     ],
     1: [
-        "Lapses asc, Interval desc",
+        "Q2: Lapses asc, Interval desc",
         "lapses asc, ivl desc"
     ],
     2: [
-        "Loser's Queue: Lapses desc, Repetitions asc, Interval asc",
+        "Loser's Queue: hardest, lapses, reps, ivl",
         "lapses desc, reps asc, ivl asc"
     ]
 
