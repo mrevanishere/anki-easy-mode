@@ -11,4 +11,13 @@ Built with
 * SQLite
 
 ## How to use
-Download the the 
+Download the the src folder and drop it in the Anki add-ons folder.
+
+## References
+* https://addon-docs.ankiweb.net/#/
+* https://github.com/ankitects/anki
+
+Inspiration from: 
+* https://github.com/xquercus/change-order-of-review-cards
+* https://github.com/lovac42/HoochieMama
+
